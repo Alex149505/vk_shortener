@@ -64,7 +64,6 @@ def is_shorten_link(access_token, url):
     )
     response.raise_for_status()
     vk_response = response.json()
-
     return "error" not in vk_response
 
 
