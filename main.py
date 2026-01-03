@@ -4,28 +4,13 @@ import requests
 from urllib.parse import urlparse
 
 
-load_dotenv()
-
-
 API_URL = "https://api.vk.com/method/"
 API_VERSION = "5.199"
 
 
-def get_service_time(access_token):
-    response = requests.get(
-        API_URL + "utils.getServerTime",
-        params={
-            "access_token": access_token,
-            "v": API_VERSION
-        }
-    )
-    response.raise_for_status()
-    return response.json()
-
-
 def shorten_link(access_token, url):
     response = requests.get(
-        API_URL + "utils.getShortLink",
+        "{}utils.getShortLink".format(API_URL),
         params={
             "access_token": access_token,
             "v": API_VERSION,
@@ -34,11 +19,11 @@ def shorten_link(access_token, url):
     )
     response.raise_for_status()
 
-    response_data = response.json()
+    vk_response = response.json()
 
-    if "error" in response_data:
+    if "error" in vk_response:
         raise RuntimeError("Вы ввели неправильную ссылку")
-    return response.json()["response"]["short_url"]
+    return vk_response["response"]["short_url"]
 
 
 def count_clicks(access_token, short_url):
@@ -46,7 +31,7 @@ def count_clicks(access_token, short_url):
     key = parsed_url.path.lstrip("/")
 
     response = requests.get(
-        API_URL + "utils.getLinkStats",
+        "{}utils.getLinkStats".format(API_URL),
         params={
             "access_token": access_token,
             "v": API_VERSION,
@@ -55,29 +40,42 @@ def count_clicks(access_token, short_url):
         }
     )
     response.raise_for_status()
-    data = response.json()
+    stats_response = response.json()
 
-    if "error" in data:
-        raise RuntimeError(data["error"]["error_msg"])
+    if "error" in stats_response:
+        raise RuntimeError(stats_response["error"]["error_msg"])
 
-    stats = data["response"]["stats"]
+    stats = stats_response["response"]["stats"]
     return sum(stat["views"] for stat in stats)
 
 
-def is_shorten_link(url):
+def is_shorten_link(access_token, url):
     parsed_url = urlparse(url)
-    return parsed_url.netloc == "vk.cc" and parsed_url.path != ""
+    key = parsed_url.path.lstrip("/")
+
+    response = requests.get(
+        "{}utils.getLinkStats".format(API_URL),
+        params={
+            "access_token": access_token,
+            "v": API_VERSION,
+            "key": key,
+            "extended": 1
+        }
+    )
+    response.raise_for_status()
+    vk_response = response.json()
+
+    return "error" not in vk_response
 
 
 def main():
-    access_token = os.getenv("VK_ACCESS_TOKEN")
-
-    print(get_service_time(access_token))
+    load_dotenv()
+    access_token = os.environ["VK_ACCESS_TOKEN"]
 
     user_url = input("Введите ссылку для сокращения: ")
 
     try:
-        if is_shorten_link(user_url):
+        if is_shorten_link(access_token, user_url):
             clicks = count_clicks(access_token, user_url)
             print("Всего переходов:", clicks)
         else:
