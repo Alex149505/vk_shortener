@@ -1,4 +1,5 @@
 import os
+import argparse
 from dotenv import load_dotenv
 import requests
 from urllib.parse import urlparse
@@ -67,11 +68,24 @@ def is_shorten_link(access_token, url):
     return "error" not in vk_response
 
 
+def create_parser():
+    parser = argparse.ArgumentParser(
+        description="Сокращает ссылки через vk.cc или показывает количество переходов"
+    )
+    parser.add_argument(
+        "url",
+        help="Ссылка для сокращения или уже сокращённая ссылка vk.cc",
+    )
+    return parser
+
+
 def main():
     load_dotenv()
     access_token = os.environ["VK_ACCESS_TOKEN"]
 
-    user_url = input("Введите ссылку для сокращения: ")
+    parser = create_parser()
+    args = parser.parse_args()
+    user_url = args.url
 
     try:
         if is_shorten_link(access_token, user_url):
