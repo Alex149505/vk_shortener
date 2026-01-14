@@ -60,6 +60,6 @@ python main.py https://vk.cc/xxxxxx
 
 ---
 
-### Project Goals
+## Project Goals
 
 This code was written for educational purposes as part of an online course for web developers at [dvmn.org](https://dvmn.org/)
