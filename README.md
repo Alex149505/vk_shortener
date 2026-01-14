@@ -24,7 +24,7 @@ pip install -r requirements.txt
 ```
 ---
 
-## inviroment variables
+## invironment variables
 
 Create a `.env` file in the project root and add:
 
@@ -47,15 +47,15 @@ Enter a link when prompted.
 ### Example: shortening a link:
 
 ```text
-Enter a link to shorten: https://google.com
-Shortened link: https://vk.cc/xxxxxx
+python main.py https://google.com
+Сокращённая ссылка: https://vk.cc/xxxxxx
 ```
 
 ### Example: getting click statistics:
 
 ```text
-Enter a link to shorten: https://vk.cc/xxxxxx
-Total clicks: 42
+python main.py https://vk.cc/xxxxxx
+Всего переходов: 42
 ```
 
 ---
